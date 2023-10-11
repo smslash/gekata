@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"gekata/pkg"
+	"gekata/pkg/fetcher"
+	"gekata/pkg/input"
 	"runtime"
 	"sync"
 	"sync/atomic"
 )
 
 func main() {
-    urls := pkg.ReadInput()
+    urls := input.ReadInput()
     cores := runtime.NumCPU()
     goroutines := make([]int32, cores)
-    results := make(chan pkg.Result, len(urls))
+    results := make(chan fetcher.Result, len(urls))
 	
     tasks := make(chan string, len(urls))
     for _, url := range urls {
@@ -26,7 +27,7 @@ func main() {
         go func(goroutineID int) {
             defer wg.Done()
             for url := range tasks {
-                result := pkg.Fetch(url)
+                result := fetcher.Fetch(url)
                 results <- result
                 atomic.AddInt32(&goroutines[goroutineID], 1)
             }
