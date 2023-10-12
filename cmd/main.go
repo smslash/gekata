@@ -14,14 +14,13 @@ func main() {
     cores := runtime.NumCPU()
     goroutines := make([]int32, cores)
     results := make(chan fetcher.Result, len(urls))
-	
+    var wg sync.WaitGroup	
     tasks := make(chan string, len(urls))
     for _, url := range urls {
         tasks <- url
     }
     close(tasks)
 
-    var wg sync.WaitGroup
     for i := 0; i < cores; i++ {
         wg.Add(1)
         go func(goroutineID int) {
@@ -43,7 +42,7 @@ func main() {
         if res.Error != nil {
             fmt.Printf(res.Error.Error() + "\n")
         } else {
-            fmt.Printf("%s;%d;%d;%d\n", res.URL, res.Code, res.Size, res.Duration.Milliseconds())
+            fmt.Printf("%s;%d;%d;%v\n", res.URL, res.Code, res.Size, res.Duration))
         }
     }
 
